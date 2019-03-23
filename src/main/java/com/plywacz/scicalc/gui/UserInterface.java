@@ -9,10 +9,13 @@ import com.plywacz.scicalc.calcmethods.Calculable;
 import com.plywacz.scicalc.calcmethods.TrigonometryMethods;
 import com.plywacz.scicalc.calcmethods.TrigonometryMethodsService;
 import com.plywacz.scicalc.enums.CalcOperation;
+import com.plywacz.scicalc.model.MethodModel;
 import java.awt.AWTEvent;
 import java.awt.event.ActionEvent;
+import java.rmi.UnexpectedException;
 import java.text.MessageFormat;
 import java.util.Date;
+import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -28,9 +31,19 @@ public class UserInterface extends javax.swing.JFrame {
      * Creates new form NewJFrame
      */
     public UserInterface() {
-        initComponents();
-        calcOperation = CalcOperation.SINUS;
+
+        listModel = new DefaultListModel<>();
+        listModel.add(0, new MethodModel("Sinus", "sin(x)"));
+        listModel.add(1, new MethodModel("Cosinus", "cos(x)"));
+        listModel.add(2, new MethodModel("Tangens", "tan(x)"));
+        listModel.add(3, new MethodModel("Cotangens", "ctan(x)"));
+        listModel.add(4, new MethodModel("secant", "sec(x)"));
+
+        
         trigonometryService = new TrigonometryMethodsService();
+
+        initComponents();
+
     }
 
     /**
@@ -65,11 +78,8 @@ public class UserInterface extends javax.swing.JFrame {
             }
         });
 
-        funcList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "sinus", "cosinus", "tangens", "cotangens", "secant" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
+        funcList.setModel(listModel);
+        funcList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         funcList.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 funcListMousePressed(evt);
@@ -96,12 +106,12 @@ public class UserInterface extends javax.swing.JFrame {
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(mainPanelLayout.createSequentialGroup()
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(textAreaScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 614, Short.MAX_VALUE)
+                    .addComponent(textAreaScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 586, Short.MAX_VALUE)
                     .addComponent(formulaInputTextField))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(evalBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
-                    .addComponent(listScrollPane)))
+                    .addComponent(listScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(evalBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)))
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -160,31 +170,44 @@ public class UserInterface extends javax.swing.JFrame {
         //does an action only when you double click on the list element
         if (evt.getClickCount() == 2) {
             int clickedItemIndex = clickedList.locationToIndex(evt.getPoint());
-            if (clickedItemIndex == 0) {
-                calcOperation = CalcOperation.SINUS;
-                formulaInputTextField.setText("sin(x)");
-            } else if (clickedItemIndex == 1) {
-                calcOperation = CalcOperation.COSINUS;
-                formulaInputTextField.setText("cos(x)");
-            } else if (clickedItemIndex == 2) {
-                calcOperation = CalcOperation.TANGENS;
-                formulaInputTextField.setText("tan(x)");
-            } else if (clickedItemIndex == 3) {
-                calcOperation = CalcOperation.COTANGENS;
-                formulaInputTextField.setText("ctan(x)");
-            } else if (clickedItemIndex == 4) {
-                calcOperation = CalcOperation.SECANT;
-                formulaInputTextField.setText("sec(x)");
-            } else {
-                Object o = clickedList.getModel().getElementAt(clickedItemIndex);
-                throw new RuntimeException("non existing item of the list chosen" + o.toString());
+
+            Object selectedItem = clickedList.getModel().getElementAt(clickedItemIndex);
+
+            MethodModel methodItem=null;
+            if (selectedItem instanceof MethodModel) {
+                 methodItem = (MethodModel) selectedItem;
+            }else{
+               // throw new UnexpectedException(clickedList +" list contains wrong items !!!");
             }
+
+        
+            
+            formulaInputTextField.setText(methodItem.getValue());
+
+//            if (clickedItemIndex == 0) {
+//                formulaInputTextField.setText("sin(x)");
+//            } else if (clickedItemIndex == 1) {
+//               
+//                formulaInputTextField.setText("cos(x)");
+//            } else if (clickedItemIndex == 2) {
+//                
+//                formulaInputTextField.setText("tan(x)");
+//            } else if (clickedItemIndex == 3) {
+//               
+//                formulaInputTextField.setText("ctan(x)");
+//            } else if (clickedItemIndex == 4) {
+//               
+//                formulaInputTextField.setText("sec(x)");
+//            } else {
+//                Object o = clickedList.getModel().getElementAt(clickedItemIndex);
+//                throw new RuntimeException("non existing item of the list chosen" + o.toString());
+//            }
         }
 
 
     }//GEN-LAST:event_funcListMousePressed
 
-    private String getMsgFormat(String formula, Double result) {
+    private String getFormattedMsg(String formula, Double result) {
 
         String msg = MessageFormat.format(
                 " {0} \t {1} = {2} \n",
@@ -199,13 +222,13 @@ public class UserInterface extends javax.swing.JFrame {
         try {
             Double res = trigonometryService.calculate(formula);
             if (res != null) {
-                historyTextArea.append(getMsgFormat(formula, res));
+                historyTextArea.append(getFormattedMsg(formula, res));
                 formulaInputTextField.setText(null);
             }
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(null, "Wrong formula given\n  "
-                    + "Your operation is: " + calcOperation.toString()
-                    + " so you just replace x with double value i.e sin(2)");
+                    + formula
+                    + "   just replace x with double value i.e sin(2)");
         }
     }
 
@@ -255,8 +278,9 @@ public class UserInterface extends javax.swing.JFrame {
         });
     }
 
-    private CalcOperation calcOperation;
     private final Calculable trigonometryService;
+    private DefaultListModel<MethodModel> listModel;
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton evalBtn;
