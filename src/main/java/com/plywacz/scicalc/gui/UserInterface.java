@@ -11,9 +11,12 @@ import com.plywacz.scicalc.calcmethods.TrigonometryMethodsService;
 import com.plywacz.scicalc.enums.CalcOperation;
 import java.awt.AWTEvent;
 import java.awt.event.ActionEvent;
+import java.text.MessageFormat;
+import java.util.Date;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import sun.applet.Main;
 
 /**
  *
@@ -181,13 +184,22 @@ public class UserInterface extends javax.swing.JFrame {
 
     }//GEN-LAST:event_funcListMousePressed
 
+    private String getMsgFormat(String formula, Double result) {
+
+        String msg = MessageFormat.format(
+                " {0} \t {1} = {2} \n",
+                new Date(), formula, result);
+
+        return msg;
+    }
+
     private void handleEvalButtonAndEnterPressed() {
         String formula = formulaInputTextField.getText();
 
         try {
             Double res = trigonometryService.calculate(formula);
             if (res != null) {
-                historyTextArea.append(formula + " = " + res + "\n");
+                historyTextArea.append(getMsgFormat(formula, res));
                 formulaInputTextField.setText(null);
             }
         } catch (IllegalArgumentException e) {
@@ -259,4 +271,5 @@ public class UserInterface extends javax.swing.JFrame {
     private javax.swing.JMenuItem resetMenuItem;
     private javax.swing.JScrollPane textAreaScrollPane;
     // End of variables declaration//GEN-END:variables
+
 }
