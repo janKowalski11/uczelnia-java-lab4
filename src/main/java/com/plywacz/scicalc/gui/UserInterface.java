@@ -5,6 +5,10 @@
  */
 package com.plywacz.scicalc.gui;
 
+import com.plywacz.scicalc.calcmethods.Calculable;
+import com.plywacz.scicalc.calcmethods.TrigonometryMethods;
+import com.plywacz.scicalc.calcmethods.TrigonometryMethodsService;
+import com.plywacz.scicalc.enums.CalcOperation;
 import javax.swing.JList;
 
 /**
@@ -18,6 +22,8 @@ public class UserInterface extends javax.swing.JFrame {
      */
     public UserInterface() {
         initComponents();
+        calcOperation = CalcOperation.SINUS;
+        trigonometryService=new TrigonometryMethodsService();
     }
 
     /**
@@ -58,6 +64,13 @@ public class UserInterface extends javax.swing.JFrame {
             }
         });
         listScrollPane.setViewportView(funcList);
+
+        formulaInputTextField.setToolTipText("");
+        formulaInputTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                formulaInputTextFieldActionPerformed(evt);
+            }
+        });
 
         historyTextArea.setColumns(20);
         historyTextArea.setRows(5);
@@ -126,21 +139,39 @@ public class UserInterface extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_exitMenuItemMousePressed
 
+    //handles calc operation choosing
     private void funcListMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_funcListMousePressed
         JList clickedList = (JList) evt.getSource();
-        
-        //does an action only when you double click on the list element
-        if (evt.getClickCount() == 2) {         
-            int clickedItemIndex = clickedList.locationToIndex(evt.getPoint());
-            if (clickedItemIndex >= 0) {
-                Object o = clickedList.getModel().getElementAt(clickedItemIndex);
-                System.out.println("Double-clicked on: " + o.toString());
-            }
 
+        //does an action only when you double click on the list element
+        if (evt.getClickCount() == 2) {
+            int clickedItemIndex = clickedList.locationToIndex(evt.getPoint());
+            if (clickedItemIndex == 0) {
+                calcOperation = CalcOperation.SINUS;            
+            } else if (clickedItemIndex == 1) {
+                calcOperation = CalcOperation.COSINUS;
+            } else if (clickedItemIndex == 2) {
+                calcOperation = CalcOperation.TANGENS;
+            } else if (clickedItemIndex == 3) {
+                calcOperation = CalcOperation.COTANGENS;
+            } else if (clickedItemIndex == 4) {
+                calcOperation = CalcOperation.SECANT;
+            } else {
+                Object o = clickedList.getModel().getElementAt(clickedItemIndex);
+                throw new RuntimeException("non existing item of the list chosen" + o.toString());
+            }
         }
 
 
     }//GEN-LAST:event_funcListMousePressed
+
+    //starts when enter is pressed
+    private void formulaInputTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formulaInputTextFieldActionPerformed
+        String formula = formulaInputTextField.getText();
+        Double res=trigonometryService.calculate(formula, calcOperation);
+        
+        System.err.println(formula);
+    }//GEN-LAST:event_formulaInputTextFieldActionPerformed
 
     /**
      * @param args the command line arguments
@@ -175,6 +206,9 @@ public class UserInterface extends javax.swing.JFrame {
             }
         });
     }
+
+    private CalcOperation calcOperation;
+    private final Calculable trigonometryService;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton evalBtn;
