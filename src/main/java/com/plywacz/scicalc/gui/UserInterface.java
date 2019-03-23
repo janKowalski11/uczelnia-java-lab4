@@ -44,8 +44,8 @@ public class UserInterface extends javax.swing.JFrame {
         listModel.add(8, new MethodModel("Addition", "a + b"));
         listModel.add(9, new MethodModel("Multiplication", "a * b"));
         listModel.add(10, new MethodModel("Exponentiation", "a ^ b"));
+        listModel.add(LAST_RESULT_INDEX, new MethodModel("Last Result", "null"));
 
-        
         trigonometryService = new TrigonometryMethodsService();
 
         initComponents();
@@ -179,10 +179,10 @@ public class UserInterface extends javax.swing.JFrame {
 
             Object selectedItem = clickedList.getModel().getElementAt(clickedItemIndex);
 
-            MethodModel methodItem=null;
+            MethodModel methodItem = null;
             if (selectedItem instanceof MethodModel) {
-                 methodItem = (MethodModel) selectedItem;
-            }else{
+                methodItem = (MethodModel) selectedItem;
+            } else {
                 //TODO throw exception 
                 //throw new UnexpectedException(clickedList +" list contains wrong items !!!");
             }
@@ -208,12 +208,16 @@ public class UserInterface extends javax.swing.JFrame {
             if (res != null) {
                 historyTextArea.append(getFormattedMsg(formula, res));
                 formulaInputTextField.setText(null);
+                
+                //reaization of last result functionality
+                MethodModel lastResult = (MethodModel)funcList.getModel().getElementAt(LAST_RESULT_INDEX);
+                lastResult.setValue(res.toString());
             }
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(null, "Wrong formula given\n  "
                     + formula
-                    + "   just replace symbols (a,b,x)  with number value i.e sin(x) replace with (sin2)\n"
-                    + "a + b replace with 2 + 3, remember to keep white spaces :)");
+                    + "   just replace symbols (a,b,x)  with number value i.e sin(x) replace with sin(2)\n"
+                    + "a + b replace with 2 + 3");
         }
     }
 
@@ -265,6 +269,7 @@ public class UserInterface extends javax.swing.JFrame {
 
     private final Calculable trigonometryService;
     private DefaultListModel<MethodModel> listModel;
+    public static final int LAST_RESULT_INDEX=11;
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
