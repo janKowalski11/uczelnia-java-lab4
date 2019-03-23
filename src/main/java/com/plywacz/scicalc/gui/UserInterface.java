@@ -12,6 +12,7 @@ import com.plywacz.scicalc.enums.CalcOperation;
 import java.awt.AWTEvent;
 import java.awt.event.ActionEvent;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 /**
@@ -180,25 +181,32 @@ public class UserInterface extends javax.swing.JFrame {
 
     }//GEN-LAST:event_funcListMousePressed
 
-    private void handleEvalButtonAndEnterPressed(java.awt.AWTEvent evt) {
+    private void handleEvalButtonAndEnterPressed() {
         String formula = formulaInputTextField.getText();
 
-        Double res = trigonometryService.calculate(formula, calcOperation);
-        if (res != null) {
-            historyTextArea.append(formula + " = " + res + "\n");
-            formulaInputTextField.setText(null);
+        try {
+            Double res = trigonometryService.calculate(formula);
+            if (res != null) {
+                historyTextArea.append(formula + " = " + res + "\n");
+                formulaInputTextField.setText(null);
+            }
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(null, "Wrong formula given\n  "
+                    + "Your operation is: " + calcOperation.toString()
+                    + " so you just replace x with double value i.e sin(2)");
         }
     }
-        //starts when enter is pressed
+
+    //starts when enter is pressed
     private void formulaInputTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formulaInputTextFieldActionPerformed
 
-        handleEvalButtonAndEnterPressed(evt);
+        handleEvalButtonAndEnterPressed();
 
     }//GEN-LAST:event_formulaInputTextFieldActionPerformed
 
     private void evalBtnMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_evalBtnMousePressed
 
-        handleEvalButtonAndEnterPressed(evt);
+        handleEvalButtonAndEnterPressed();
     }//GEN-LAST:event_evalBtnMousePressed
 
     /**
