@@ -9,7 +9,10 @@ import com.plywacz.scicalc.calcmethods.Calculable;
 import com.plywacz.scicalc.calcmethods.TrigonometryMethods;
 import com.plywacz.scicalc.calcmethods.TrigonometryMethodsService;
 import com.plywacz.scicalc.enums.CalcOperation;
+import java.awt.AWTEvent;
+import java.awt.event.ActionEvent;
 import javax.swing.JList;
+import javax.swing.JTextField;
 
 /**
  *
@@ -23,7 +26,7 @@ public class UserInterface extends javax.swing.JFrame {
     public UserInterface() {
         initComponents();
         calcOperation = CalcOperation.SINUS;
-        trigonometryService=new TrigonometryMethodsService();
+        trigonometryService = new TrigonometryMethodsService();
     }
 
     /**
@@ -52,6 +55,11 @@ public class UserInterface extends javax.swing.JFrame {
         setMinimumSize(new java.awt.Dimension(400, 400));
 
         evalBtn.setText("Evaluate");
+        evalBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                evalBtnMousePressed(evt);
+            }
+        });
 
         funcList.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "sinus", "cosinus", "tangens", "cotangens", "secant" };
@@ -65,6 +73,7 @@ public class UserInterface extends javax.swing.JFrame {
         });
         listScrollPane.setViewportView(funcList);
 
+        formulaInputTextField.setText("sin(x)");
         formulaInputTextField.setToolTipText("");
         formulaInputTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -72,6 +81,7 @@ public class UserInterface extends javax.swing.JFrame {
             }
         });
 
+        historyTextArea.setEditable(false);
         historyTextArea.setColumns(20);
         historyTextArea.setRows(5);
         textAreaScrollPane.setViewportView(historyTextArea);
@@ -147,15 +157,20 @@ public class UserInterface extends javax.swing.JFrame {
         if (evt.getClickCount() == 2) {
             int clickedItemIndex = clickedList.locationToIndex(evt.getPoint());
             if (clickedItemIndex == 0) {
-                calcOperation = CalcOperation.SINUS;            
+                calcOperation = CalcOperation.SINUS;
+                formulaInputTextField.setText("sin(x)");
             } else if (clickedItemIndex == 1) {
                 calcOperation = CalcOperation.COSINUS;
+                formulaInputTextField.setText("cos(x)");
             } else if (clickedItemIndex == 2) {
                 calcOperation = CalcOperation.TANGENS;
+                formulaInputTextField.setText("tan(x)");
             } else if (clickedItemIndex == 3) {
                 calcOperation = CalcOperation.COTANGENS;
+                formulaInputTextField.setText("ctan(x)");
             } else if (clickedItemIndex == 4) {
                 calcOperation = CalcOperation.SECANT;
+                formulaInputTextField.setText("sec(x)");
             } else {
                 Object o = clickedList.getModel().getElementAt(clickedItemIndex);
                 throw new RuntimeException("non existing item of the list chosen" + o.toString());
@@ -165,13 +180,26 @@ public class UserInterface extends javax.swing.JFrame {
 
     }//GEN-LAST:event_funcListMousePressed
 
-    //starts when enter is pressed
-    private void formulaInputTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formulaInputTextFieldActionPerformed
+    private void handleEvalButtonAndEnterPressed(java.awt.AWTEvent evt) {
         String formula = formulaInputTextField.getText();
-        Double res=trigonometryService.calculate(formula, calcOperation);
-        
-        System.err.println(formula);
+
+        Double res = trigonometryService.calculate(formula, calcOperation);
+        if (res != null) {
+            historyTextArea.append(formula + " = " + res + "\n");
+            formulaInputTextField.setText(null);
+        }
+    }
+        //starts when enter is pressed
+    private void formulaInputTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formulaInputTextFieldActionPerformed
+
+        handleEvalButtonAndEnterPressed(evt);
+
     }//GEN-LAST:event_formulaInputTextFieldActionPerformed
+
+    private void evalBtnMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_evalBtnMousePressed
+
+        handleEvalButtonAndEnterPressed(evt);
+    }//GEN-LAST:event_evalBtnMousePressed
 
     /**
      * @param args the command line arguments
