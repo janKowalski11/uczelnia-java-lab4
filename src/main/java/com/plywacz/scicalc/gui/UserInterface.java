@@ -38,6 +38,12 @@ public class UserInterface extends javax.swing.JFrame {
         listModel.add(2, new MethodModel("Tangens", "tan(x)"));
         listModel.add(3, new MethodModel("Cotangens", "ctan(x)"));
         listModel.add(4, new MethodModel("secant", "sec(x)"));
+        listModel.add(5, new MethodModel("Pi", "pi"));
+        listModel.add(6, new MethodModel("Golden ratio", "[phi]"));
+        listModel.add(7, new MethodModel("Euler's Number", "e"));
+        listModel.add(8, new MethodModel("Addition", "a + b"));
+        listModel.add(9, new MethodModel("Multiplication", "a * b"));
+        listModel.add(10, new MethodModel("Exponentiation", "a ^ b"));
 
         
         trigonometryService = new TrigonometryMethodsService();
@@ -164,7 +170,7 @@ public class UserInterface extends javax.swing.JFrame {
     }//GEN-LAST:event_exitMenuItemMousePressed
 
     //handles calc operation choosing
-    private void funcListMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_funcListMousePressed
+    private void funcListMousePressed(java.awt.event.MouseEvent evt)  {//GEN-FIRST:event_funcListMousePressed
         JList clickedList = (JList) evt.getSource();
 
         //does an action only when you double click on the list element
@@ -177,34 +183,12 @@ public class UserInterface extends javax.swing.JFrame {
             if (selectedItem instanceof MethodModel) {
                  methodItem = (MethodModel) selectedItem;
             }else{
-               // throw new UnexpectedException(clickedList +" list contains wrong items !!!");
+                //TODO throw exception 
+                //throw new UnexpectedException(clickedList +" list contains wrong items !!!");
             }
 
-        
-            
             formulaInputTextField.setText(methodItem.getValue());
-
-//            if (clickedItemIndex == 0) {
-//                formulaInputTextField.setText("sin(x)");
-//            } else if (clickedItemIndex == 1) {
-//               
-//                formulaInputTextField.setText("cos(x)");
-//            } else if (clickedItemIndex == 2) {
-//                
-//                formulaInputTextField.setText("tan(x)");
-//            } else if (clickedItemIndex == 3) {
-//               
-//                formulaInputTextField.setText("ctan(x)");
-//            } else if (clickedItemIndex == 4) {
-//               
-//                formulaInputTextField.setText("sec(x)");
-//            } else {
-//                Object o = clickedList.getModel().getElementAt(clickedItemIndex);
-//                throw new RuntimeException("non existing item of the list chosen" + o.toString());
-//            }
         }
-
-
     }//GEN-LAST:event_funcListMousePressed
 
     private String getFormattedMsg(String formula, Double result) {
@@ -228,7 +212,8 @@ public class UserInterface extends javax.swing.JFrame {
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(null, "Wrong formula given\n  "
                     + formula
-                    + "   just replace x with double value i.e sin(2)");
+                    + "   just replace symbols (a,b,x)  with number value i.e sin(x) replace with (sin2)\n"
+                    + "a + b replace with 2 + 3, remember to keep white spaces :)");
         }
     }
 
